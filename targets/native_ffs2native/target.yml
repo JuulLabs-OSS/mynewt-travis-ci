@@ -1,0 +1,2 @@
+target.app: "@apache-mynewt-core/apps/ffs2native"
+target.bsp: "@apache-mynewt-core/hw/bsp/native"

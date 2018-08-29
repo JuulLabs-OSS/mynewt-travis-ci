@@ -1,0 +1,6 @@
+pkg.name: "targets/nrf52840pdk_pwm_test"
+pkg.type: "target"
+pkg.description: 
+pkg.author: 
+pkg.homepage: 
+

@@ -1,0 +1,2 @@
+target.app: "@apache-mynewt-core/apps/testbench"
+target.bsp: "@apache-mynewt-core/hw/bsp/nrf52840pdk"

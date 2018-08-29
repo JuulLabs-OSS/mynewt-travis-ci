@@ -1,0 +1,2 @@
+syscfg.vals:
+    LORA_MAC_TIMER_NUM: 1

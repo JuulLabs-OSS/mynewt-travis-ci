@@ -1,0 +1,2 @@
+target.app: "@apache-mynewt-core/apps/pwm_test"
+target.bsp: "@apache-mynewt-core/hw/bsp/nrf52840pdk"

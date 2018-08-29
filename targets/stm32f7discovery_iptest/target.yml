@@ -1,0 +1,2 @@
+target.app: "@apache-mynewt-core/apps/iptest"
+target.bsp: "@apache-mynewt-core/hw/bsp/stm32f7discovery"

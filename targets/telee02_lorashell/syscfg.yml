@@ -1,0 +1,4 @@
+syscfg.vals:
+    LORA_MAC_TIMER_NUM: 0
+    LORA_NODE_REGION: 1
+    LORA_NODE_CLI: 0
