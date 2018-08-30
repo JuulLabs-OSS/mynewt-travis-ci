@@ -1,3 +1,5 @@
+#!/bin/bash -x
+
 case $TEST in
   "TEST_ALL")
         # These tests fail on 14.04 which travis uses

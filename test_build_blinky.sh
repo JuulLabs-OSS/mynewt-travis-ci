@@ -65,7 +65,7 @@ do
     newt target create -s $target
     newt target set -s $target bsp="@apache-mynewt-core/hw/bsp/$bsp"
     newt target set -s $target app="apps/blinky"
-    newt build -s $target 2>&1
+    newt build -q $target
 
     if [ $? -ne 0 ]; then
             EXIT_CODE=$?
