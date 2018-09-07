@@ -27,7 +27,7 @@ case $TEST in
         newt build -q -l info all
      ;;
   "BUILD_BLINKY")
-        ${TRAVIS_BUILD_DIR}/ci/test_build_blinky.sh
+        $HOME/ci/test_build_blinky.sh
      ;;
   *)  exit 1
      ;;

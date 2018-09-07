@@ -40,4 +40,4 @@ cp $GOPATH/bin/newt $HOME/bin
 
 cd $OLD_DIR
 
-. ci/linux_toolchain_install.sh
+. $HOME/ci/linux_toolchain_install.sh
