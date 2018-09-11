@@ -16,29 +16,26 @@
 # specific language governing permissions and limitations
 # under the License.
 
-rc=0
-case $TEST in
-  "TEST_ALL")
-     # These tests fail on 14.04 which travis uses
-     newt test all -e net/oic/test,net/ip/mn_socket/test
-     rc=$?
-     ;;
-  "BUILD_TARGETS")
-     # Without suppressing output, travis complains that the log is too big
-     # Without output, travis terminates a job that doesn't print out anything in a few minutes
-     newt build -q -l info all
-     rc=$?
-     ;;
-  "BUILD_BLINKY")
-     $HOME/ci/test_build_blinky.sh
-     rc=$?
-     ;;
-  "BUILD_PORTS")
-     $HOME/ci/build_ports.sh
-     rc=$?
-     ;;
-  *) exit 1
-     ;;
-esac
+NIMBLE_URL=$(pwd)
+NIMBLE_VER="travis-build"
+RIOT_PATH="RIOT"
 
-exit $rc
+git tag $NIMBLE_VER
+[[ $? -ne 0 ]] && exit 1
+
+git clone https://github.com/RIOT-OS/RIOT $RIOT_PATH
+[[ $? -ne 0 ]] && exit 1
+
+pushd $RIOT_PATH
+pushd pkg/nimble/
+sed -i'.bak' 's|PKG_URL.*|PKG_URL = '"$NIMBLE_URL"'|' Makefile
+sed -i'.bak' 's|PKG_VERSION.*|PKG_VERSION = '"$NIMBLE_VER"'|' Makefile
+sed -i'.bak' 's|SRC += hci_common.c||' nimble.mk
+popd
+pushd examples/nimble_gatt/
+
+make
+[[ $? -ne 0 ]] && exit 1
+
+popd
+popd
