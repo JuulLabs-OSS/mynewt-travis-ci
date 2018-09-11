@@ -1,4 +1,5 @@
-#!/bin/sh -x
+#!/bin/bash -x
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -18,8 +19,6 @@
 
 echo "Doing Linux install"
 
-OLD_DIR=$PWD
-
 export GOPATH=$HOME/gopath
 
 mkdir -p $HOME/bin $GOPATH || true
@@ -27,17 +26,20 @@ mkdir -p $HOME/bin $GOPATH || true
 go version
 
 go get mynewt.apache.org/newt/newt
+[[ $? -ne 0 ]] && exit 1
 
 rm -rf $GOPATH/bin $GOPATH/pkg
 
-cd $GOPATH/src/mynewt.apache.org/newt/
+pushd $GOPATH/src/mynewt.apache.org/newt/
 
 git checkout mynewt_1_4_1_tag
+[[ $? -ne 0 ]] && exit 1
 
 go install mynewt.apache.org/newt/newt
+[[ $? -ne 0 ]] && exit 1
 
 cp $GOPATH/bin/newt $HOME/bin
 
-cd $OLD_DIR
+popd
 
-. $HOME/ci/linux_toolchain_install.sh
+source $HOME/ci/linux_toolchain_install.sh
