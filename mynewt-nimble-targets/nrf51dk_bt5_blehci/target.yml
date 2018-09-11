@@ -1,0 +1,4 @@
+### Target: targets/nrf51dk_bt5_blehci
+target.app: "@apache-mynewt-nimble/apps/blehci"
+target.bsp: "@apache-mynewt-core/hw/bsp/nrf51dk"
+target.build_profile: "optimized"
