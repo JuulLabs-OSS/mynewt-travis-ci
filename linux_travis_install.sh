@@ -18,26 +18,17 @@
 
 echo "Doing Linux install"
 
-OLD_DIR=$PWD
+NEWT_URL="https://raw.githubusercontent.com/runtimeco/binary-releases/master"
+NEWT_VER="1.4.1"
+NEWT_REL="1"
+NEWT_DEB="newt_${NEWT_VER}-${NEWT_REL}_amd64.deb"
 
-export GOPATH=$HOME/gopath
+wget -c "${NEWT_URL}/mynewt-newt-tools_${NEWT_VER}/${NEWT_DEB}"
+[[ $? -ne 0 ]] && exit 1
 
-mkdir -p $HOME/bin $GOPATH || true
+sudo dpkg -i "${NEWT_DEB}"
+[[ $? -ne 0 ]] && exit 1
 
-go version
-
-go get mynewt.apache.org/newt/newt
-
-rm -rf $GOPATH/bin $GOPATH/pkg
-
-cd $GOPATH/src/mynewt.apache.org/newt/
-
-git checkout mynewt_1_4_1_tag
-
-go install mynewt.apache.org/newt/newt
-
-cp $GOPATH/bin/newt $HOME/bin
-
-cd $OLD_DIR
+rm -f "${NEWT_DEB}"
 
 . $HOME/ci/linux_toolchain_install.sh
