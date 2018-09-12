@@ -23,3 +23,7 @@ brew tap runtimeco/homebrew-mynewt
 
 brew cask uninstall oclint
 brew install Caskroom/cask/gcc-arm-embedded mynewt-newt gcc5
+
+# Upgrade python to v3
+# Required to build RIOT OS
+brew upgrade python
