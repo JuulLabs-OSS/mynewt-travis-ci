@@ -30,16 +30,9 @@ go get mynewt.apache.org/newt/newt
 
 rm -rf $GOPATH/bin $GOPATH/pkg
 
-pushd $GOPATH/src/mynewt.apache.org/newt/
-
-git checkout mynewt_1_4_1_tag
-[[ $? -ne 0 ]] && exit 1
-
 go install mynewt.apache.org/newt/newt
 [[ $? -ne 0 ]] && exit 1
 
 cp $GOPATH/bin/newt $HOME/bin
-
-popd
 
 source $HOME/ci/linux_toolchain_install.sh
