@@ -16,20 +16,25 @@
 # specific language governing permissions and limitations
 # under the License.
 
+rc=0
 case $TEST in
   "TEST_ALL")
-        # These tests fail on 14.04 which travis uses
-        newt test all -e net/oic/test,net/ip/mn_socket/test
+     # These tests fail on 14.04 which travis uses
+     newt test all -e net/oic/test,net/ip/mn_socket/test
+     rc=$?
      ;;
   "BUILD_TARGETS")
-        # Without suppressing output, travis complains that the log is too big
-        # Without output, travis terminates a job that doesn't print out anything in a few minutes
-        newt build -q -l info all
+     # Without suppressing output, travis complains that the log is too big
+     # Without output, travis terminates a job that doesn't print out anything in a few minutes
+     newt build -q -l info all
+     rc=$?
      ;;
   "BUILD_BLINKY")
-        $HOME/ci/test_build_blinky.sh
+     $HOME/ci/test_build_blinky.sh
+     rc=$?
      ;;
-  *)  exit 1
+  *) exit 1
      ;;
 esac
 
+exit $rc
