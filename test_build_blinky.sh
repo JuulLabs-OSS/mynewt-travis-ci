@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -x
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -69,7 +70,17 @@ declare -a bsps_arr=(
 "vbluno52"
 )
 
-BSP_PATH="repos/apache-mynewt-core/hw/bsp/"
+MASTER_ZIP="master.zip"
+BLINKY_URL="https://github.com/apache/mynewt-blinky/archive"
+
+wget -q -c "${BLINKY_URL}/${MASTER_ZIP}" -O "$HOME/${MASTER_ZIP}"
+[[ $? -ne 0 ]] && exit 1
+
+unzip -q "$HOME/${MASTER_ZIP}" -d "$HOME"
+[[ $? -ne 0 ]] && exit 1
+
+ln -s "$HOME/mynewt-blinky-master/apps/blinky" apps/blinky
+
 EXIT_CODE=0
 
 for bsp in "${bsps_arr[@]}"
@@ -77,17 +88,16 @@ do
     echo "Testing bsp=$bsp"
 
     target="test-blinky-$bsp"
-    newt target delete -s $target &> /dev/null
+    newt target delete -s -f $target &> /dev/null
     newt target create -s $target
     newt target set -s $target bsp="@apache-mynewt-core/hw/bsp/$bsp"
     newt target set -s $target app="apps/blinky"
     newt build -q $target
 
-    if [ $? -ne 0 ]; then
-            EXIT_CODE=$?
-    fi
+    rc=$?
+    [[ $rc -ne 0 ]] && EXIT_CODE=$rc
 
-    newt target delete -s $target
+    newt target delete -s -f $target
 done
 
 exit $EXIT_CODE
