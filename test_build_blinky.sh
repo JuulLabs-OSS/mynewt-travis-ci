@@ -29,12 +29,13 @@ unzip -q "$HOME/${MASTER_ZIP}" -d "$HOME"
 ln -s "$HOME/mynewt-blinky-master/apps/blinky" apps/blinky
 
 EXIT_CODE=0
-
 BSPS="$(ls ${TRAVIS_BUILD_DIR}/hw/bsp)"
 
 for bsp in ${BSPS}; do
-    if [[ "${IGNORED_BSPS}" =~ .*${bsp}.* ]]; then
-        echo "Skipping \"${bsp}\""
+    # NOTE: do not remove the spaces around IGNORED_BSPS; it's required to
+    #       match against the first and last entries
+    if [[ " ${IGNORED_BSPS} " =~ [[:blank:]]${bsp}[[:blank:]] ]]; then
+        echo "Skipping bsp=$bsp"
         continue
     fi
 
