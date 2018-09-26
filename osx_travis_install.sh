@@ -22,7 +22,21 @@ brew tap Caskroom/cask
 brew tap runtimeco/homebrew-mynewt
 
 brew cask uninstall oclint
-brew install Caskroom/cask/gcc-arm-embedded mynewt-newt gcc5
+
+MAX_RETRIES=3
+PKGS=(Caskroom/cask/gcc-arm-embedded mynewt-newt gcc5)
+
+for pkg in ${PKGS[@]}; do
+    retry=0
+    while [[ $retry -lt $MAX_RETRIES ]]; do
+        brew install $pkg
+        [[ $? -eq 0 ]] && break
+        # wait a little bit
+        sleep 5
+        retry=$((retry + 1))
+    done
+    [[ $retry -eq $MAX_RETRIES ]] && exit 1
+done
 
 # Upgrade python to v3
 # Required to build RIOT OS
