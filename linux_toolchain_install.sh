@@ -32,6 +32,3 @@ for i in ${TOOLCHAIN_PATH}/${GCC_BASE}/bin/arm-none-eabi-* ; do
     rm -f  ~/bin/${i##*/}
     ln -s $i ~/bin/${i##*/}
 done
-
-ln -s /usr/bin/gcc-7 ~/bin/gcc
-ln -s /usr/bin/g++-7 ~/bin/g++

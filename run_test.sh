@@ -1,4 +1,5 @@
-#!/bin/bash -x
+#!/bin/bash
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -19,14 +20,11 @@
 rc=0
 case $TEST in
   "TEST_ALL")
-     # These tests fail on 14.04 which travis uses
-     newt test all -e net/oic/test,net/ip/mn_socket/test
+     $HOME/ci/test_all.sh
      rc=$?
      ;;
   "BUILD_TARGETS")
-     # Without suppressing output, travis complains that the log is too big
-     # Without output, travis terminates a job that doesn't print out anything in a few minutes
-     newt build -q -l info all
+     $HOME/ci/test_build_targets.sh
      rc=$?
      ;;
   "BUILD_BLINKY")
