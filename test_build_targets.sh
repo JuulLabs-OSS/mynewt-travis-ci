@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,29 +17,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
-echo "Doing Linux install"
+EXIT_CODE=0
 
-export GOPATH=$HOME/gopath
+TARGETS=$(cat ${TRAVIS_BUILD_DIR}/targets.txt)
+for target in ${TARGETS}; do
+    echo "Building target=$target"
 
-mkdir -p $HOME/bin $GOPATH || true
+    # Without suppressing output, travis complains that the log is too big
+    # Without output, travis terminates a job that doesn't print out anything in a few minutes
+    newt build -q -l info $target
 
-go version
+    rc=$?
+    [[ $rc -ne 0 ]] && EXIT_CODE=$rc
+done
 
-go get mynewt.apache.org/newt/newt
-[[ $? -ne 0 ]] && exit 1
-
-rm -rf $GOPATH/bin $GOPATH/pkg
-
-go install mynewt.apache.org/newt/newt
-[[ $? -ne 0 ]] && exit 1
-
-cp $GOPATH/bin/newt $HOME/bin
-
-# Do not install ARM toolchain when running "newt test"
-if [ $TEST != "TEST_ALL" ]; then
-  source $HOME/ci/linux_toolchain_install.sh
-else
-  # FIXME: should use update-alternatives here maybe?
-  ln -s /usr/bin/gcc-7 ~/bin/gcc
-  ln -s /usr/bin/g++-7 ~/bin/g++
-fi
+exit $EXIT_CODE

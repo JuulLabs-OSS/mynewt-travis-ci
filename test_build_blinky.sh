@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -29,9 +29,9 @@ unzip -q "$HOME/${MASTER_ZIP}" -d "$HOME"
 ln -s "$HOME/mynewt-blinky-master/apps/blinky" apps/blinky
 
 EXIT_CODE=0
-BSPS="$(ls ${TRAVIS_BUILD_DIR}/hw/bsp)"
 
-for bsp in ${BSPS}; do
+TARGETS=$(cat ${TRAVIS_BUILD_DIR}/targets.txt)
+for bsp in ${TARGETS}; do
     # NOTE: do not remove the spaces around IGNORED_BSPS; it's required to
     #       match against the first and last entries
     if [[ " ${IGNORED_BSPS} " =~ [[:blank:]]${bsp}[[:blank:]] ]]; then
