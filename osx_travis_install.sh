@@ -38,6 +38,8 @@ for pkg in ${PKGS[@]}; do
     [[ $retry -eq $MAX_RETRIES ]] && exit 1
 done
 
-# Upgrade python to v3
-# Required to build RIOT OS
-brew upgrade python
+if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble ]]; then
+    # Upgrade python to v3
+    # Required to build RIOT OS
+    brew upgrade python
+fi
