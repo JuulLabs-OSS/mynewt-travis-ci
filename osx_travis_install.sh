@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/bash -x
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -18,28 +18,35 @@
 
 echo "Doing OSX install"
 
-brew tap Caskroom/cask
-brew tap runtimeco/homebrew-mynewt
+# Updating homebrew takes a long time, so avoid doing it
+# unless explicitly requested
+export HOMEBREW_NO_AUTO_UPDATE=1
 
-brew cask uninstall oclint
+if [ "${TEST}" == "TEST_ALL" ]; then
+    brew tap runtimeco/homebrew-mynewt
 
-MAX_RETRIES=3
-PKGS=(Caskroom/cask/gcc-arm-embedded mynewt-newt gcc5)
+    # conflicts with gcc5
+    brew cask uninstall oclint
+
+    PKGS=(mynewt-newt gcc5)
+else
+    brew untap caskroom/cask
+    brew tap homebrew/cask
+    brew tap runtimeco/homebrew-mynewt
+
+    # FIXME: casks don't work with `fetch --retry`
+    PKGS=(mynewt-newt)
+
+    brew cask install gcc-arm-embedded
+fi
 
 for pkg in ${PKGS[@]}; do
-    retry=0
-    while [[ $retry -lt $MAX_RETRIES ]]; do
-        brew install $pkg
-        [[ $? -eq 0 ]] && break
-        # wait a little bit
-        sleep 5
-        retry=$((retry + 1))
-    done
-    [[ $retry -eq $MAX_RETRIES ]] && exit 1
+    brew fetch --retry $pkg
+    brew install $pkg
 done
 
-if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble ]]; then
-    # Upgrade python to v3
-    # Required to build RIOT OS
-    brew upgrade python
+if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble && $TEST == "BUILD_PORTS" ]]; then
+    # RIOT-OS requires update to Python3
+    # To fetch Python3, database must be up to date
+    brew update && brew upgrade python
 fi
