@@ -16,4 +16,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
+pushd porting/examples/
+
+pushd dummy
+make
+[[ $? -ne 0 ]] && exit 1
+popd
+
+pushd linux
+make
+[[ $? -ne 0 ]] && exit 1
+popd
+
+popd
+
 source $HOME/ci/build_nimble_riot.sh
