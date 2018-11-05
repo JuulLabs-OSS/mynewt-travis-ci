@@ -1,0 +1,16 @@
+This directory contains two .js files that have the code required to run
+both runkit endpoints. To avoid making github tokens visible, the travis
+script sends data to runkit.com, which is responsible for doing the GH API
+calls. To setup:
+
+`github-commenter.js` expects a `GITHUB_BOT_TOKEN` env variable to be set
+up in runkit.com. This can be any user, and a new user `apache-mynewt-bot`
+was created to be used here.
+
+`github-status-reporter.js` expects a `GITHUB_ACCESS_TOKEN` var which has
+to be a token with permissions to write on the repository so a commiter
+has to create it.
+
+The auto-generated tokens when connecting runkit<->github don't seem to
+work, so create new keys for both above under github and configure them
+in runkit.com.
