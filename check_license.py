@@ -34,9 +34,8 @@ TRAVIS_COMMIT_RANGE = os.environ['TRAVIS_COMMIT_RANGE']
 LICENSE_BOT_ID = "<!-- license-bot -->"
 RAT_PATH = "apache-rat.jar"
 TARBALL_NAME = "archive.tgz"
-RAT_URL = "https://repository.apache.org/content/repositories/snapshots/org" \
-          "/apache/rat/apache-rat/0.14-SNAPSHOT/apache-rat-0.14-20181013" \
-          ".213930-1.jar"
+RAT_URL = "https://repository.apache.org/content/repositories/releases/org" \
+          "/apache/rat/apache-rat/0.13/apache-rat-0.13.jar"
 
 GH_STATUS_REPORTER_URL = "https://github-status-reporter-eb26h8raupyw.runkit.sh"
 GH_COMMENTER_URL = "https://github-commenter-l845aj3j3m9f.runkit.sh"
@@ -48,6 +47,8 @@ def install_rat():
     '''
     r = requests.get(RAT_URL)
     if r.status_code != 200:
+        if DEBUG:
+            print("RAT download failed with status {}", r.status_code)
         exit(1)
     open(RAT_PATH, 'wb').write(r.content)
 
@@ -162,8 +163,14 @@ if not added_files:
     # TODO: need to send success status as well?
     exit(0)
 
+if DEBUG:
+    print("Installing RAT...")
 install_rat()
+if DEBUG:
+    print("Archiving files...")
 tar_files(TARBALL_NAME, added_files)
+if DEBUG:
+    print("Running RAT...")
 output = run_rat(RAT_PATH, TARBALL_NAME)
 rat = json.loads(output)
 
