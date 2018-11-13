@@ -181,7 +181,7 @@ if new_files_amount == 0:
     print("No new files were added, exiting")
     exit(0)
 
-unknown_amount = int(rat['unknown_amount'])
+unknown_amount = int(rat.get('unknown_amount', 0))
 
 # FIXME: known but category-x should be flagged
 if unknown_amount == 0:
