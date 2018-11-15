@@ -22,14 +22,13 @@
 <xsl:output method='text'/>
 <xsl:template match='/'>{
   "timestamp": "<xsl:value-of select='rat-report/@timestamp' />",
-  <xsl:if test="descendant::resource[license-approval/@name='false']">"unknown_amount": "<xsl:value-of select='count(descendant::header-type[attribute::name="?????"])' />",
-  "unknown": [<xsl:for-each select='descendant::resource[license-approval/@name="false"]'>
+  <xsl:if test="descendant::resource[license-approval/@name='false']">"unknown": [<xsl:for-each
+          select='descendant::resource[license-approval/@name="false"]'>
     {
       "name": "<xsl:value-of select='@name'/>"
     }<xsl:if test="position() != last()">,</xsl:if>
   </xsl:for-each>
   ],</xsl:if>
-  "files_amount": "<xsl:value-of select='count(descendant::resource)' />",
   "files": [<xsl:for-each select='descendant::resource'>
     {
       "name": "<xsl:value-of select='@name'/>",

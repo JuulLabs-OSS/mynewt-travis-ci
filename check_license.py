@@ -25,7 +25,7 @@ import tarfile
 from datetime import datetime
 
 
-DEBUG = os.environ.get('DEBUG', 0)
+DEBUG = int(os.environ.get('DEBUG', 0))
 RAT_STYLESHEET = os.environ['HOME'] + '/ci/mynewt-rat-json.xsl'
 
 TRAVIS_REPO_SLUG = os.environ['TRAVIS_REPO_SLUG']
@@ -176,12 +176,11 @@ rat = json.loads(output)
 
 commits = get_commit_list(TRAVIS_COMMIT_RANGE)
 
-new_files_amount = int(rat['files_amount'])
-if new_files_amount == 0:
+if len(rat.get('files', {})) == 0:
     print("No new files were added, exiting")
     exit(0)
 
-unknown_amount = int(rat.get('unknown_amount', 0))
+unknown_amount = len(rat.get('unknown', {}))
 
 # FIXME: known but category-x should be flagged
 if unknown_amount == 0:
@@ -261,5 +260,8 @@ else:
         sha, state = commit, 'failure'
         break
 
-if not send_status(owner, repo, sha, state) or state == 'failure':
+# NOTE: The license check only fails if communicating with the endpoint fails,
+# if failing is interesting after .rat-excludes was included, can also check
+# for `state == 'failure'` below
+if not send_status(owner, repo, sha, state):
     exit(1)
