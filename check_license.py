@@ -97,19 +97,16 @@ def get_files_per_commits(commits):
     Accepts a list of commits (sha) and returns a map [added file -> sha]
     '''
     file_in_commit = {}
-    n = 0
-    while n < len(commits) - 1:
-        old, new = commits[n], commits[n+1]
-        cmd = "git log --no-commit-id --name-only --diff-filter=A {}..{}"\
-            .format(old, new)
+    for commit in commits:
+        cmd = "git log --no-commit-id --name-only --diff-filter=A {0}~..{0}"\
+            .format(commit)
         if DEBUG:
             print("Executing: " + cmd)
         output = subprocess.check_output(cmd.split()).decode()
         if DEBUG:
             print(output)
         for file in output.splitlines():
-            file_in_commit[file] = new
-        n += 1
+            file_in_commit[file] = commit
     if DEBUG:
         print("Result: {}".format(file_in_commit))
     return file_in_commit
