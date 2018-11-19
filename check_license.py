@@ -110,6 +110,8 @@ def get_files_per_commits(commits):
         for file in output.splitlines():
             file_in_commit[file] = new
         n += 1
+    if DEBUG:
+        print("Result: {}".format(file_in_commit))
     return file_in_commit
 
 
@@ -192,13 +194,21 @@ file_in_commit = get_files_per_commits(commits)
 # Under unknown and files, look for each file and add an extra
 # key->val for the sha where it was added
 
-unknown_files = rat['unknown']
-for file in unknown_files:
-    file['sha'] = file_in_commit[file['name']]
+try:
+    unknown_files = rat['unknown']
+    for file in unknown_files:
+        file['sha'] = file_in_commit[file['name']]
+except KeyError:
+    print("Key {} not found in 'unknown': {}".format(file['name'], file_in_commit))
+    exit(1)
 
-new_files = rat['files']
-for file in new_files:
-    file['sha'] = file_in_commit[file['name']]
+try:
+    new_files = rat['files']
+    for file in new_files:
+        file['sha'] = file_in_commit[file['name']]
+except KeyError:
+    print("Key {} not found in 'files': {}".format(file['name'], file_in_commit))
+    exit(1)
 
 commit_url = "https://github.com/{}/blob".format(TRAVIS_REPO_SLUG)
 unknown_files_fmt = [
