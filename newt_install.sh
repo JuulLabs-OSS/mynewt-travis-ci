@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/sh -x
 
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -17,16 +17,18 @@
 # specific language governing permissions and limitations
 # under the License.
 
-echo "Doing Linux install"
+export GOPATH=$HOME/gopath
 
-# Install newt.
-$HOME/ci/newt_install.sh
+mkdir -p $HOME/bin $GOPATH || true
 
-# Do not install ARM toolchain when running "newt test"
-if [ $TEST != "TEST_ALL" ]; then
-  source $HOME/ci/linux_toolchain_install.sh
-else
-  # FIXME: should use update-alternatives here maybe?
-  ln -s /usr/bin/gcc-7 ~/bin/gcc
-  ln -s /usr/bin/g++-7 ~/bin/g++
-fi
+go version
+
+go get mynewt.apache.org/newt/newt
+[[ $? -ne 0 ]] && exit 1
+
+rm -rf $GOPATH/bin $GOPATH/pkg
+
+go install mynewt.apache.org/newt/newt
+[[ $? -ne 0 ]] && exit 1
+
+cp $GOPATH/bin/newt $HOME/bin
