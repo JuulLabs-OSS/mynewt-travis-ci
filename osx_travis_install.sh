@@ -22,21 +22,21 @@ echo "Doing OSX install"
 # unless explicitly requested
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-if [ "${TEST}" == "TEST_ALL" ]; then
-    brew tap runtimeco/homebrew-mynewt
+# Install newt.
+$HOME/ci/newt_install.sh
 
+if [ "${TEST}" == "TEST_ALL" ]; then
     # conflicts with gcc5
     brew cask uninstall oclint
 
-    PKGS=(mynewt-newt gcc5)
+    PKGS=(gcc5)
 else
     brew untap caskroom/cask
     brew tap homebrew/cask
-    brew tap runtimeco/homebrew-mynewt
+
+    PKGS=()
 
     # FIXME: casks don't work with `fetch --retry`
-    PKGS=(mynewt-newt)
-
     brew cask install gcc-arm-embedded
 fi
 
