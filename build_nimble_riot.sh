@@ -30,7 +30,6 @@ pushd $RIOT_PATH
 pushd pkg/nimble/
 sed -i'.bak' 's|PKG_URL.*|PKG_URL = '"$NIMBLE_URL"'|' Makefile
 sed -i'.bak' 's|PKG_VERSION.*|PKG_VERSION = '"$NIMBLE_VER"'|' Makefile
-sed -i'.bak' 's|SRC += hci_common.c||' nimble.mk
 popd
 pushd examples/nimble_gatt/
 
