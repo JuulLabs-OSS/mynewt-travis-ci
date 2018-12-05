@@ -30,6 +30,7 @@ pushd $RIOT_PATH
 pushd pkg/nimble/
 sed -i'.bak' 's|PKG_URL.*|PKG_URL = '"$NIMBLE_URL"'|' Makefile
 sed -i'.bak' 's|PKG_VERSION.*|PKG_VERSION = '"$NIMBLE_VER"'|' Makefile
+rm patches/ -rf
 
 # `ble_hs_stop.c` isn't in an official nimble release yet.  Add it to the
 # makefile.
