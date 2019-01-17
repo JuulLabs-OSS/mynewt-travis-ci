@@ -36,6 +36,10 @@ else
 
     PKGS=()
 
+    pushd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask
+    git checkout b3a2e0c930~
+    popd
+
     # FIXME: casks don't work with `fetch --retry`
     brew cask install gcc-arm-embedded
 fi
