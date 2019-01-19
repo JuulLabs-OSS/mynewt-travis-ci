@@ -32,13 +32,15 @@ if [ "${TEST}" == "TEST_ALL" ]; then
     PKGS=(gcc5)
 else
     brew untap caskroom/cask
-    brew tap homebrew/cask
 
-    PKGS=()
+    # Tap full clone to allow checkout of specific sha below
+    brew tap --full homebrew/cask
 
     pushd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask
     git checkout b3a2e0c930~
     popd
+
+    PKGS=()
 
     # FIXME: casks don't work with `fetch --retry`
     brew cask install gcc-arm-embedded
