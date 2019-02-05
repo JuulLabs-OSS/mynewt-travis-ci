@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,55 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-EXIT_CODE=0
+set -e
 
-declare -a commands=(
-"newt"
-"newt help"
-"newt version"
-"newt new project"
-"cd project/"
-"newt install"
-"newt info"
-"newt build my_blinky_sim"
-"newt clean my_blinky_sim"
-"newt build all"
-"newt test @apache-mynewt-core/kernel/os"
-"newt upgrade"
-"cp -r $HOME/ci/mynewt-core-targets/nrf52840pdk_btshell/ targets/nrf52840pdk_btshell"
-"newt build nrf52840pdk_btshell"
-"newt create-image nrf52840pdk_btshell 1.0.0"
-"newt resign-image bin/targets/nrf52840pdk_btshell/app/apps/btshell/btshell.img"
-"newt size nrf52840pdk_btshell"
-"newt size -F -R nrf52840pdk_btshell"
-"newt vals api app bsp build_profile compiler lib sdk target"
-"newt pkg new --type=pkg sys/mylib"
-"newt pkg copy apps/blinky apps/myapp"
-"newt pkg move apps/myapp apps/newapp"
-"newt pkg remove apps/newapp"
-"newt target show"
-"newt target create my_target1"
-"newt target set my_target1 bsp=@apache-mynewt-core/hw/bsp/nrf52840pdk"
-"newt target set my_target1 app=apps/blinky"
-"newt target set my_target1 build_profile=optimized cflags=\"-DNDEBUG\""
-"newt target set my_target1 syscfg=LOG_NEWTMGR=1:CONFIG_NEWTMGR=0"
-"newt target config init -f my_target1"
-"newt target copy my_target1 my_target2"
-"newt target amend my_target1 lflags=\"-Lmylib\" syscfg=LOG_LEVEL:CONFIG_NEWTMGR=0"
-"newt target delete -f my_target1"
-"newt target cmake nrf52840pdk_btshell"
-"newt target dep nrf52840pdk_btshell"
-"newt target revdep nrf52840pdk_btshell"
-"newt sync"
-)
-
-for cmd in "${commands[@]}"
-do
-    echo "$cmd"
-    ${cmd}
-    rc=$?
-    [[ $rc -ne 0 ]] && EXIT_CODE=$rc
-    echo "rc=$rc"
-done
-
-exit $EXIT_CODE
+./test_newt_cmds.sh
+./test_newt_dump.sh
