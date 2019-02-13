@@ -17,7 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cd newt_dump/proj || exit 1
+cd ci/newt_dump/proj || exit 1
 
 # Ensure newt generates the expected intermediate representation of each
 # target.
