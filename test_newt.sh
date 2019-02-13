@@ -19,5 +19,5 @@
 
 set -e
 
-./test_newt_cmds.sh
-./test_newt_dump.sh
+$HOME/ci/test_newt_cmds.sh
+$HOME/ci/test_newt_dump.sh
