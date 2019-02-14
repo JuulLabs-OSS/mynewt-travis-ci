@@ -1,5 +1,2 @@
-$import:
-    - 'misc/importa.yml'
-
 syscfg.vals:
     HAL_FLASH_VERIFY_ERASES: 1
