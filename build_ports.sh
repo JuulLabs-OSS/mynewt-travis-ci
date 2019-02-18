@@ -28,6 +28,11 @@ make
 [[ $? -ne 0 ]] && exit 1
 popd
 
+pushd linux_blemesh
+make
+[[ $? -ne 0 ]] && exit 1
+popd
+
 popd
 
 source $HOME/ci/build_nimble_riot.sh
