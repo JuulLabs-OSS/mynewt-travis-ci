@@ -19,16 +19,19 @@
 pushd porting/examples/
 
 pushd dummy
+make clean
 make
 [[ $? -ne 0 ]] && exit 1
 popd
 
 pushd linux
+make clean
 make
 [[ $? -ne 0 ]] && exit 1
 popd
 
 pushd linux_blemesh
+make clean
 make
 [[ $? -ne 0 ]] && exit 1
 popd
