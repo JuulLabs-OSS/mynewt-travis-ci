@@ -33,13 +33,6 @@ sed -i'.bak' 's|PKG_URL.*|PKG_URL = '"$NIMBLE_URL"'|' Makefile
 sed -i'.bak' 's|PKG_VERSION.*|PKG_VERSION = '"$NIMBLE_VER"'|' Makefile
 rm patches/ -rf
 
-# Add files that are not in official nimble release yet.
-sed -i '3s|^|SRC += ble_hs_stop.c\
-|' nimble.host.mk
-
-sed -i '3s|^|SRC += ble_ll_utils.c\
-|' controller.mk
-
 popd
 pushd examples/nimble_gatt/
 
