@@ -1563,10 +1563,6 @@
         "console": "@apache-mynewt-core/sys/console/stub"
     },
     "unsatisfied_apis": {
-        "console": [
-            "@apache-mynewt-core/hw/mcu/native",
-            "@apache-mynewt-core/kernel/os"
-        ],
         "log": [
             "@apache-mynewt-core/sys/log/modlog"
         ]
