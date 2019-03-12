@@ -19,11 +19,38 @@
 
 EXIT_CODE=0
 
+blacklist=(
+    "net/oic/selftest"
+    "net/ip/mn_socket/selftest"
+
+    # The below tests are included for backwards compatibility.  They can be
+    # removed when the corresponding packages are removed from mynewt-core.
+    "net/oic/test"
+    "net/ip/mn_socket/test"
+)
+
+is_blacklisted() {
+    local sought="$1"
+    local elem
+    shift
+
+    for elem in "${blacklist[@]}"
+    do
+        if [ "$elem" = "$sought" ]
+        then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 TARGETS=$(cat ${TRAVIS_BUILD_DIR}/targets.txt)
 for unittest in ${TARGETS}; do
     # TODO: ignore tests that fail on Ubuntu 14.04
     if [ ${TRAVIS_OS_NAME} = "linux" ]; then
-        if [ "$unittest" = "net/oic/test" -o "$unittest" = "net/ip/mn_socket/test" ]; then
+        if is_blacklisted "$unittest"
+        then
             echo "Ignoring $unittest"
             continue
         fi
