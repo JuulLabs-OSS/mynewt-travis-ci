@@ -1,0 +1,5 @@
+pkg.name: "targets/nrf52840pdk_btshell_sm_sc_legacy"
+pkg.type: "target"
+pkg.description: 
+pkg.author: 
+pkg.homepage: 
