@@ -19,8 +19,8 @@
 
 TOOLCHAIN_PATH=$HOME/TOOLCHAIN
 
-GCC_URL=https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
-GCC_BASE=gcc-arm-none-eabi-7-2018-q2-update
+GCC_URL=https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2
+GCC_BASE=gcc-arm-none-eabi-8-2018-q4-major
 
 mkdir -p $TOOLCHAIN_PATH
 
