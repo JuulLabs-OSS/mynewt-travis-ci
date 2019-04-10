@@ -1,3 +1,0 @@
-syscfg.vals:
-    BLE_MESH_SETTINGS: 1
-    CONFIG_NFFS: 1

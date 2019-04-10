@@ -1,4 +1,0 @@
-### Target: targets/nrf52840pdk_btshell
-target.app: "@apache-mynewt-nimble/apps/btshell"
-target.bsp: "@apache-mynewt-core/hw/bsp/nrf52840pdk"
-target.build_profile: "debug"

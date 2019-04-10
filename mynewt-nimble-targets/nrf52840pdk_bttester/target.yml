@@ -1,4 +1,0 @@
-### Target: targets/nrf52840pdk_bttester
-target.app: "@apache-mynewt-nimble/apps/bttester"
-target.bsp: "@apache-mynewt-core/hw/bsp/nrf52840pdk"
-target.build_profile: "debug"

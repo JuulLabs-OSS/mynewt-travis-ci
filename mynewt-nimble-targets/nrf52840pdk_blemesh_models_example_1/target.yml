@@ -1,3 +1,0 @@
-target.app: "@apache-mynewt-nimble/apps/blemesh_models_example_1"
-target.bsp: "@apache-mynewt-core/hw/bsp/nrf52840pdk"
-target.build_profile: "debug"

@@ -1,2 +1,0 @@
-target.app: "@apache-mynewt-nimble/apps/blehr"
-target.bsp: "@apache-mynewt-core/hw/bsp/nrf52840pdk"

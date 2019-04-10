@@ -1,3 +1,0 @@
-*** targets/nrf51dk_boot
-Note: security is disabled in this boot loader target.  With security,
-the boot loader is just barely too large to fit on the nRF51.
