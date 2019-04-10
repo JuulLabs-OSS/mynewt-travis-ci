@@ -1,6 +1,0 @@
-syscfg.vals:
-    BOOTUTIL_SIGN_RSA: 0
-    BOOTUTIL_SIGN_ECC: 0
-    UART_0: 0
-    TIMER_0: 0
-    OS_CPUTIME_TIMER_NUM: -1
