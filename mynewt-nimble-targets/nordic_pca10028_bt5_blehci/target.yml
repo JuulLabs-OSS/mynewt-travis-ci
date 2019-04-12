@@ -1,0 +1,4 @@
+### Target: targets/nordic_pca10028_bt5_blehci
+target.app: "@apache-mynewt-nimble/apps/blehci"
+target.bsp: "@apache-mynewt-core/hw/bsp/nordic_pca10028"
+target.build_profile: "optimized"
