@@ -21,9 +21,16 @@ project.name: "apache-mynewt-core"
 
 project.repositories:
     - apache-mynewt-nimble
+    - mcuboot
 
 repository.apache-mynewt-nimble:
     type: github
     vers: 0.0.0
     user: apache
     repo: mynewt-nimble
+
+repository.mcuboot:
+    type: github
+    vers: 0.0.0
+    user: JuulLabs-OSS
+    repo: mcuboot
