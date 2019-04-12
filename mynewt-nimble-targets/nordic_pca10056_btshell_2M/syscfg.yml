@@ -1,0 +1,2 @@
+syscfg.vals:
+    BLE_LL_CFG_FEAT_LE_2M_PHY: 1

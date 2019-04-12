@@ -1,0 +1,4 @@
+### Target: targets/nordic_pca10056_bttester
+target.app: "@apache-mynewt-nimble/apps/bttester"
+target.bsp: "@apache-mynewt-core/hw/bsp/nordic_pca10056"
+target.build_profile: "debug"
