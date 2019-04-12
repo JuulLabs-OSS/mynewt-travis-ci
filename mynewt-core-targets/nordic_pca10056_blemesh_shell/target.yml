@@ -1,0 +1,2 @@
+target.app: "@apache-mynewt-nimble/apps/blemesh_shell"
+target.bsp: "@apache-mynewt-core/hw/bsp/nordic_pca10056"
