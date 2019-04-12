@@ -38,7 +38,8 @@ case $TEST in
     target_list=$(find ${TRAVIS_BUILD_DIR} -iname pkg.yml -exec grep -H "pkg\.type: *unittest" {} \; | cut -d: -f1 | sed s#/pkg.yml##g | sed s#^${TRAVIS_BUILD_DIR}/##g | grep -v "^repos/" | sort)
     ;;
   "BUILD_TARGETS")
-    target_list=$(ls targets/mynewt-core-targets)
+    base=$(basename $TRAVIS_REPO_SLUG)
+    target_list=$(ls targets/${base}-targets)
     ;;
   "BUILD_BLINKY")
     target_list=$(ls ${TRAVIS_BUILD_DIR}/hw/bsp)
