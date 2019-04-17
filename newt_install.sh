@@ -23,8 +23,13 @@ mkdir -p $HOME/bin $GOPATH || true
 
 go version
 
-go get mynewt.apache.org/newt/newt
-[[ $? -ne 0 ]] && exit 1
+for i in 1 2 3
+do
+   go get mynewt.apache.org/newt/newt
+   [[ $? -eq 0 ]] && break
+   [[ $i -eq 3 ]] && exit 1
+   sleep 30
+done
 
 rm -rf $GOPATH/bin $GOPATH/pkg
 
