@@ -1,4 +1,4 @@
 ### Target: targets/nordic_pca10028_boot
-target.app: "@apache-mynewt-core/apps/boot"
+target.app: "@mcuboot/boot/mynewt"
 target.bsp: "@apache-mynewt-core/hw/bsp/nordic_pca10028"
 target.build_profile: "optimized"
