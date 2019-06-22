@@ -21,6 +21,7 @@ cd $HOME/ci/newt_dump/proj || exit 1
 
 # Ensure newt generates the expected intermediate representation of each
 # target.
+status=0
 for i in ../answers/*
 do
     target="$(basename $i)"
@@ -28,4 +29,13 @@ do
 
     printf "Checking target \"$target\"\n"
     diff "$i" <(newt target dump "$target")
+    rc="$?"
+
+    # Remember failure.
+    if [ "$rc" -ne 0 ]
+    then
+        status="$rc"
+    fi
 done
+
+exit "$status"
