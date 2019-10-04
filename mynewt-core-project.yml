@@ -37,6 +37,6 @@ repository.mcuboot:
 
 repository.apache-mynewt-mcumgr:
     type: github
-    vers: 0.0.0
-    user: apache
+    vers: mynewt_mcumgr-commit 
+    user: vrahane
     repo: mynewt-mcumgr
