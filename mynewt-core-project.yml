@@ -22,6 +22,7 @@ project.name: "apache-mynewt-core"
 project.repositories:
     - apache-mynewt-nimble
     - mcuboot
+    - apache-mynewt-mcumgr
 
 repository.apache-mynewt-nimble:
     type: github
@@ -37,6 +38,6 @@ repository.mcuboot:
 
 repository.apache-mynewt-mcumgr:
     type: github
-    vers: mynewt_mcumgr-commit 
-    user: vrahane
+    vers: 0.0.0
+    user: apache
     repo: mynewt-mcumgr
