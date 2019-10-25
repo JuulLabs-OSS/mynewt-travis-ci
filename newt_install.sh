@@ -18,6 +18,7 @@
 # under the License.
 
 export GOPATH=$HOME/gopath
+export GO111MODULE=on
 
 mkdir -p $HOME/bin $GOPATH || true
 
