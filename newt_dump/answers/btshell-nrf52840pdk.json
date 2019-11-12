@@ -5919,6 +5919,15 @@
             }
         ]
     },
+    "pre_build_cmds": {
+        "cmds": []
+    },
+    "pre_link_cmds": {
+        "cmds": []
+    },
+    "post_link_cmds": {
+        "cmds": []
+    },
     "logcfg": {
         "logs": {}
     },
