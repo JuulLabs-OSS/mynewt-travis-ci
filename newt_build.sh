@@ -17,30 +17,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
-rc=0
-case $TEST in
-  "TEST_ALL")
-     $HOME/ci/test_all.sh
-     rc=$?
-     ;;
-  "BUILD_TARGETS" | "BUILD_TARGETS_WINDOWS")
-     $HOME/ci/test_build_targets.sh
-     rc=$?
-     ;;
-  "BUILD_BLINKY")
-     $HOME/ci/test_build_blinky.sh
-     rc=$?
-     ;;
-  "BUILD_PORTS")
-     $HOME/ci/build_ports.sh
-     rc=$?
-     ;;
-  "TEST_NEWT")
-     $HOME/ci/test_newt.sh
-     rc=$?
-     ;;
-  *) exit 1
-     ;;
-esac
 
-exit $rc
+# This script should be used from mynewt-newt source root directory
+
+mkdir -p $GOPATH/bin
+export PATH=$GOPATH/bin:$PATH
+
+if [[ ${TRAVIS_OS_NAME} = "windows" ]]; then
+    echo 'Building newt for Windows'
+    pushd newt/ || exit
+    go build
+    mv newt.exe newt
+else
+    echo 'Building newt'
+    ./build.sh
+    pushd newt/ || exit
+fi
+
+cp newt $GOPATH/bin/
+popd || exit
