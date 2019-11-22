@@ -17,8 +17,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cd $HOME/ci/newt_dump/proj || exit 1
-
 # Ensure newt generates the expected intermediate representation of each
 # target.
 status=0
@@ -28,12 +26,14 @@ do
     target="${target%.json}"
 
     printf "Checking target \"$target\"\n"
-    diff "$i" <(newt target dump "$target")
+    newt target dump "$target" > tmp.txt
+    diff  --strip-trailing-cr "$i" tmp.txt
     rc="$?"
 
     # Remember failure.
     if [ "$rc" -ne 0 ]
     then
+        echo "rc=$rc"
         status="$rc"
     fi
 done

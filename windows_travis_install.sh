@@ -17,11 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-echo "Doing OSX install"
-
-# Updating homebrew takes a long time, so avoid doing it
-# unless explicitly requested
-export HOMEBREW_NO_AUTO_UPDATE=1
+echo "Doing Windows install"
 
 if [ "${TRAVIS_REPO_SLUG}" == "*mynewt-newt" ]; then
     $HOME/ci/newt_build.sh
@@ -29,36 +25,8 @@ else
     $HOME/ci/newt_install.sh
 fi
 
-if [ "${TEST}" == "TEST_ALL" ] || [ "${TEST}" == "TEST_NEWT" ]; then
-    # conflicts with gcc5
-    brew cask uninstall oclint
-
-    PKGS=(gcc5)
-fi
+mkdir -p $HOME/.newt/
 
 if [ "${TEST}" != "TEST_ALL" ]; then
-    brew untap caskroom/cask
-
-    # Tap full clone to allow checkout of specific sha below
-    brew tap --full homebrew/cask
-
-    pushd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask
-    git checkout b3a2e0c930~
-    popd
-
-    PKGS=()
-
-    # FIXME: casks don't work with `fetch --retry`
-    brew cask install gcc-arm-embedded
-fi
-
-for pkg in ${PKGS[@]}; do
-    brew fetch --retry $pkg
-    brew install $pkg
-done
-
-if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble && $TEST == "BUILD_PORTS" ]]; then
-    # RIOT-OS requires update to Python3
-    # To fetch Python3, database must be up to date
-    brew update && brew upgrade python
+    choco install gcc-arm-embedded
 fi

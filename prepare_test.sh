@@ -48,6 +48,14 @@ case $TEST in
     # don't need to do anything here
     exit 0
     ;;
+  "BUILD_TARGETS_WINDOWS")
+    echo "nordic_pca10056_btshell" > ${TRAVIS_BUILD_DIR}/targets.txt
+    exit 0
+    ;;
+  "TEST_NEWT")
+    # don't need to do anything here
+    exit 0
+    ;;
   *)
     exit 1
     ;;

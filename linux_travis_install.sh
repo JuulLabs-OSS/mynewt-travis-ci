@@ -19,14 +19,19 @@
 
 echo "Doing Linux install"
 
-# Install newt.
-$HOME/ci/newt_install.sh
+if [ "${TRAVIS_REPO_SLUG}" == "*mynewt-newt" ]; then
+    $HOME/ci/newt_build.sh
+else
+    $HOME/ci/newt_install.sh
+fi
 
 # Do not install ARM toolchain when running "newt test"
-if [ $TEST != "TEST_ALL" ]; then
-  source $HOME/ci/linux_toolchain_install.sh
-else
+if [ "${TEST}" == "TEST_ALL" ] || [ "${TEST}" == "TEST_NEWT" ]; then
   # FIXME: should use update-alternatives here maybe?
-  ln -s /usr/bin/gcc-7 ~/bin/gcc
-  ln -s /usr/bin/g++-7 ~/bin/g++
+    ln -s /usr/bin/gcc-7 ~/bin/gcc
+    ln -s /usr/bin/g++-7 ~/bin/g++
+fi
+
+if [ "${TEST}" != "TEST_ALL" ]; then
+    source $HOME/ci/linux_toolchain_install.sh
 fi

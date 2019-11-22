@@ -24,17 +24,12 @@ declare -a commands=(
 "newt version"
 "newt new project"
 "cd project/"
-"newt install"
+"newt install -v --escape=false apache-mynewt-core apache-mynewt-nimble"
 "newt info"
-"newt build my_blinky_sim"
-"newt clean my_blinky_sim"
-"newt build all"
-"newt test @apache-mynewt-core/kernel/os"
 "newt upgrade"
 "cp -r $HOME/ci/mynewt-core-targets/* targets"
 "newt build nordic_pca10056_btshell"
 "newt create-image nordic_pca10056_btshell 1.0.0"
-"newt resign-image bin/targets/nordic_pca10056_btshell/app/apps/btshell/btshell.img"
 "newt size nordic_pca10056_btshell"
 "newt size -F -R nordic_pca10056_btshell"
 "newt vals api app bsp build_profile compiler lib sdk target"
@@ -50,13 +45,20 @@ declare -a commands=(
 "newt target set my_target1 syscfg=LOG_NEWTMGR=1:CONFIG_NEWTMGR=0"
 "newt target config init -f my_target1"
 "newt target copy my_target1 my_target2"
-"newt target amend my_target1 lflags=\"-Lmylib\" syscfg=LOG_LEVEL:CONFIG_NEWTMGR=0"
+"newt target amend my_target1 lflags=\"-Lmylib\" syscfg=LOG_LEVEL=0:CONFIG_NEWTMGR=0"
 "newt target delete -f my_target1"
+"newt target delete -f my_target2"
 "newt target cmake nordic_pca10056_btshell"
 "newt target dep nordic_pca10056_btshell"
 "newt target revdep nordic_pca10056_btshell"
 "newt sync"
 )
+
+if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
+    commands+=("newt test @apache-mynewt-core/kernel/os")
+    commands+=("newt build my_blinky_sim")
+    commands+=("newt clean my_blinky_sim")
+fi
 
 for cmd in "${commands[@]}"
 do
