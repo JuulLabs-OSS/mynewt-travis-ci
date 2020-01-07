@@ -58,8 +58,8 @@ for unittest in ${TARGETS}; do
 
     echo "Testing unittest=$unittest"
     # under travis' settings for the repo add DEBUG=1 env var
-    if [ ! -z ${DEBUG} -a ${DEBUG} -eq 1 ]; then
-        newt test -ldebug -v $unitest
+    if [ "${DEBUG}" = "1" ]; then
+        newt test -ldebug -v $unittest
     else
         newt test -q $unittest
     fi
