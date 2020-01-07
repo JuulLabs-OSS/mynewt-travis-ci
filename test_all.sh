@@ -57,8 +57,12 @@ for unittest in ${TARGETS}; do
     fi
 
     echo "Testing unittest=$unittest"
-    # under travis' settings for the repo add DEBUG=1 env var
-    if [ "${DEBUG}" = "1" ]; then
+
+    # On Travis settings define a NEWT_TEST_DEBUG environment variable with
+    # a space separated list of tests to run with debug enabled, eg:
+    #   NEWT_TEST_DEBUG="kernel/os/selftest util/rwlock/selftest"
+
+    if [[ $NEWT_TEST_DEBUG == *"${unittest}"* ]]; then
         newt test -ldebug -v $unittest
     else
         newt test -q $unittest
