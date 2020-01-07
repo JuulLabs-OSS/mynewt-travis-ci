@@ -57,7 +57,12 @@ for unittest in ${TARGETS}; do
     fi
 
     echo "Testing unittest=$unittest"
-    newt test -q $unittest
+    # under travis' settings for the repo add DEBUG=1 env var
+    if [ ! -z ${DEBUG} -a ${DEBUG} -eq 1 ]; then
+        newt test -ldebug -v $unitest
+    else
+        newt test -q $unittest
+    fi
 
     rc=$?
     [[ $rc -ne 0 ]] && EXIT_CODE=$rc
