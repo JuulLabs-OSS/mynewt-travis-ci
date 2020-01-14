@@ -55,7 +55,7 @@ declare -a commands=(
 )
 
 if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
-    commands+=("newt test @apache-mynewt-core/kernel/os")
+    commands+=("newt test @apache-mynewt-core/util/cbmem")
     commands+=("newt build my_blinky_sim")
     commands+=("newt clean my_blinky_sim")
 fi
