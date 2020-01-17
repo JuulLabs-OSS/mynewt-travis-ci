@@ -17,6 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from utils import cli, backend
 import os
 import os.path as path
 import re
@@ -28,10 +29,8 @@ TRAVIS_REPO_SLUG = os.environ['TRAVIS_REPO_SLUG']
 TRAVIS_COMMIT_RANGE = os.environ['TRAVIS_COMMIT_RANGE']
 TRAVIS_PULL_REQUEST = os.environ['TRAVIS_PULL_REQUEST']
 STYLE_BOT_ID = "<!-- style-bot -->"
-DEBUG = int(os.environ.get('DEBUG', 0))
+DEBUG = bool(os.environ.get('DEBUG', False))
 SOURCE_EXTS = ['.c', '.h']
-GH_STATUS_REPORTER_URL = "https://github-status-reporter-eb26h8raupyw.runkit.sh"
-GH_COMMENTER_URL = "https://github-commenter-l845aj3j3m9f.runkit.sh"
 
 GH_COMMENT_TITLE = """
 {}
@@ -61,19 +60,6 @@ def load_ignored_dirs():
             line = line.strip()
             if line != "" and regex.match(line) is not None:
                 IGNORED_DIRS.append(line)
-
-
-def get_changed_files(commit_range):
-    '''
-    Get a list of new files added in current PR
-    '''
-    added_files_cmd = "git diff --no-commit-id --name-only -r {}".format(commit_range)
-    if DEBUG:
-        print("Executing: " + added_files_cmd)
-    output = subprocess.check_output(added_files_cmd.split()).decode()
-    if DEBUG:
-        print("output: " + output)
-    return output.splitlines()
 
 
 def is_package(p):
@@ -115,7 +101,10 @@ def is_valid(f):
     return in_package(f)
 
 
-def get_style_diff(f):
+def get_added_style_diff(f):
+    '''
+    Run uncrustify for files that are new, can run on whole file.
+    '''
     uncrustify_cmd = "uncrustify -c uncrustify.cfg {}".format(f)
     if DEBUG:
         print("Executing: " + uncrustify_cmd)
@@ -143,15 +132,119 @@ def get_style_diff(f):
     return output
 
 
-def new_comment(owner, repo, pr, comment_body):
-    json = {
-        'owner': owner,
-        'repo': repo,
-        'number': pr,
-        'body': comment_body,
-    }
-    r = requests.post(GH_COMMENTER_URL, json=json)
-    return r.status_code == 200
+def get_changed_style_diff(f, commit_range):
+    '''
+    Run uncrustify for files that were changed in this PR.
+
+    First get all changes from the original file to the committed file,
+    then find the ranges where changes happened; later exclude from the
+    styled file any suggestions that apply to lines that were not
+    touched by the commits in the PR.
+    '''
+
+    # First get differences between new and old version, to later isolate
+    # only the style checks in this range.
+
+    first, last = commit_range.split('...')
+    diff_cmd = "git diff -u {}..{} {}".format(first, last, f)
+    if DEBUG:
+        print("Executing: " + diff_cmd)
+    output = subprocess.check_output(diff_cmd.split()).decode()
+    if DEBUG:
+        print("output: " + output)
+
+    # In the unified diff format each segment is preceeded by a header:
+    # "@@ -[line-number],[number-of-lines] +[line-number],[number-of-lines] @@"
+
+    DIFF_RANGE = '^@@ -[0-9]+,[0-9]+ \+([0-9]+),[0-9]+ @@'
+
+    # TODO: if it can be assumed that a diff range always begins and ends
+    #       with 3 non-changed lines, it would be better to just parse the
+    #       number of lines in the regex and subtract 6!
+
+    range_re = re.compile(DIFF_RANGE)
+    ranges = []
+    n = 0
+    first_p = last_p = 0
+    for line in output.splitlines()[4:]:
+        m = range_re.match(line)
+        if m:
+            n = int(m.group(1))
+            if first_p != 0 and last_p != 0:
+                ranges.append((first_p, last_p - first_p + 1))
+            first_p = last_p = 0
+        else:
+            if n == 0:
+                # Check that we are starting in the right place.
+                raise Exception("Invalid diff file")
+            elif line.startswith("+"):
+                if first_p == 0:
+                    first_p = n
+                    last_p = n
+                else:
+                    last_p = n
+                n += 1
+            elif not line.startswith("-"):
+                n += 1
+
+    # Add last range
+    if first_p != 0 and last_p != 0:
+        ranges.append((first_p, last_p - first_p + 1))
+
+    uncrustify_cmd = "uncrustify -c uncrustify.cfg {}".format(f)
+    if DEBUG:
+        print("Executing: " + uncrustify_cmd)
+    output = subprocess.check_output(uncrustify_cmd.split()).decode()
+    if DEBUG:
+        print("output: " + output)
+
+    # TODO: check return code and that file was created...
+    diff_cmd = "diff -u {} {}".format(f, "{}.uncrustify".format(f))
+    output = ""
+    if DEBUG:
+        print("Executing: " + diff_cmd)
+    try:
+        subprocess.check_output(diff_cmd.split())
+    except subprocess.CalledProcessError as e:
+        # files differ
+        if e.returncode == 1:
+            output = e.output.decode('utf-8')
+        else:
+            raise Exception("Error generating diff for: {}".format(f))
+        # remove initial diff lines with file names
+        lines = output.splitlines()[2:]
+    if DEBUG:
+        print("output: " + output)
+
+    # FIXME: if there were no changes, output here will be == "", and
+    #        the lines below will fail. But could this ever happen?
+
+    # Use range of file before uncrustify was run, to check if the style
+    # suggestion only exists in the new file
+
+    DIFF_RANGE = '^@@ -([0-9]+),([0-9]+) \+[0-9]+,[0-9]+ @@'
+
+    range_re = re.compile(DIFF_RANGE)
+
+    if output != "":
+        valid_lines = []
+        valid = False
+        for line in lines:
+            m = range_re.match(line)
+            if m:
+                valid = False
+                # use the original file's range data
+                ln, n = int(m.group(1)), int(m.group(2))
+                for r in ranges:
+                    # does the current chunk intesect with some range?
+                    if ln + n > r[0] and n < (r[0] + r[1]):
+                        valid = True
+                        break
+            if valid:
+                valid_lines.append(line)
+        output = "\n".join(valid_lines)
+
+    return output
 
 
 def main():
@@ -161,13 +254,25 @@ def main():
 
     load_ignored_dirs()
 
-    changed_files = get_changed_files(TRAVIS_COMMIT_RANGE)
-    print(changed_files)
+    added_files = cli.get_added_files(TRAVIS_COMMIT_RANGE, DEBUG)
+    if DEBUG:
+        print(added_files)
+
+    changed_files = cli.get_changed_files(TRAVIS_COMMIT_RANGE, DEBUG)
+    if DEBUG:
+        print(changed_files)
+
+    file_outputs = []
+
+    source_files = [f for f in added_files if is_valid(f)]
+    for source in source_files:
+        output = get_added_style_diff(source)
+        if output != "":
+            file_outputs.append((source, output))
 
     source_files = [f for f in changed_files if is_valid(f)]
-    file_outputs = []
     for source in source_files:
-        output = get_style_diff(source)
+        output = get_changed_style_diff(source, TRAVIS_COMMIT_RANGE)
         if output != "":
             file_outputs.append((source, output))
 
@@ -183,7 +288,7 @@ def main():
     if DEBUG:
         print("Comment body: ", comment)
     owner, repo = TRAVIS_REPO_SLUG.split("/")
-    if not new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
+    if not backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
         exit(1)
 
 
