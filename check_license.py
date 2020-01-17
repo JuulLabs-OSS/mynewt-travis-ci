@@ -17,6 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from utils import cli, backend
 import subprocess
 import os
 import requests
@@ -25,7 +26,7 @@ import tarfile
 from datetime import datetime
 
 
-DEBUG = int(os.environ.get('DEBUG', 0))
+DEBUG = bool(os.environ.get('DEBUG', False))
 RAT_STYLESHEET = os.environ['HOME'] + '/ci/mynewt-rat-json.xsl'
 
 TRAVIS_REPO_SLUG = os.environ['TRAVIS_REPO_SLUG']
@@ -37,7 +38,8 @@ TARBALL_NAME = "archive.tgz"
 RAT_URL = "https://repository.apache.org/content/repositories/releases/org" \
           "/apache/rat/apache-rat/0.13/apache-rat-0.13.jar"
 
-GH_STATUS_REPORTER_URL = "https://github-status-reporter-eb26h8raupyw.runkit.sh"
+GH_STATUS_REPORTER_URL = \
+    "https://github-status-reporter-eb26h8raupyw.runkit.sh"
 GH_COMMENTER_URL = "https://github-commenter-l845aj3j3m9f.runkit.sh"
 
 
@@ -77,21 +79,6 @@ def run_rat(rat_path, tarball):
     return output
 
 
-def get_commit_list(commit_range):
-    '''
-    Get a list of commits in this PR, from older to newer
-    '''
-    first, last = commit_range.split('...')
-    cmd = "git log --pretty=format:%H {}..{}".format(first+'~', last)
-    if DEBUG:
-        print("Executing: " + cmd)
-    output = subprocess.check_output(cmd.split()).decode()
-    if DEBUG:
-        print("output: " + output)
-    # revert to get from older to newer
-    return output.splitlines()[::-1]
-
-
 def get_files_per_commits(commits):
     '''
     Accepts a list of commits (sha) and returns a map [added file -> sha]
@@ -112,49 +99,12 @@ def get_files_per_commits(commits):
     return file_in_commit
 
 
-def get_added_files(commit_range):
-    '''
-    Get a list of new files added in current PR
-    '''
-    added_files_cmd = "git diff --no-commit-id --name-only -r " \
-                      "--diff-filter=A {}".format(commit_range)
-    if DEBUG:
-        print("Executing: " + added_files_cmd)
-    output = subprocess.check_output(added_files_cmd.split()).decode()
-    if DEBUG:
-        print("output: " + output)
-    return output.splitlines()
-
-
-def send_status(owner, repo, sha, state):
-    json = {
-        'owner': owner,
-        'repo': repo,
-        'target_url': os.environ['TRAVIS_BUILD_WEB_URL'],
-        'sha': sha,
-        'state': state,
-    }
-    r = requests.post(GH_STATUS_REPORTER_URL, json=json)
-    return r.status_code == 200
-
-
-def new_comment(owner, repo, pr, comment_body):
-    json = {
-        'owner': owner,
-        'repo': repo,
-        'number': pr,
-        'body': comment_body,
-    }
-    r = requests.post(GH_COMMENTER_URL, json=json)
-    return r.status_code == 200
-
-
 # Perform license check only on a PR
 if TRAVIS_PULL_REQUEST == "false":
     print("Not a PR, exiting")
     exit(0)
 
-added_files = get_added_files(TRAVIS_COMMIT_RANGE)
+added_files = cli.get_added_files(TRAVIS_COMMIT_RANGE, DEBUG)
 
 # If there are no new files, there is no need to perform license check
 if not added_files:
@@ -173,7 +123,7 @@ if DEBUG:
 output = run_rat(RAT_PATH, TARBALL_NAME)
 rat = json.loads(output)
 
-commits = get_commit_list(TRAVIS_COMMIT_RANGE)
+commits = cli.get_commit_list(TRAVIS_COMMIT_RANGE, DEBUG)
 
 if len(rat.get('files', {})) == 0:
     print("No new files were added, exiting")
@@ -253,7 +203,7 @@ comment = """
 
 if DEBUG:
     print("Comment body: ", comment)
-if not new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
+if not backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
     exit(1)
 
 # FIXME: check category-x?
@@ -270,5 +220,5 @@ else:
 # NOTE: The license check only fails if communicating with the endpoint fails,
 # if failing is interesting after .rat-excludes was included, can also check
 # for `state == 'failure'` below
-if not send_status(owner, repo, sha, state):
+if not backend.send_status(owner, repo, sha, state):
     exit(1)
