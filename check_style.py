@@ -18,6 +18,7 @@
 # under the License.
 
 from utils import cli, backend
+import difflib
 import os
 import os.path as path
 import re
@@ -101,6 +102,15 @@ def is_valid(f):
     return in_package(f)
 
 
+def diff_files(old_name, new_name):
+    with open(old_name) as f:
+        new = f.readlines()
+    with open(new_name) as f:
+        old = f.readlines()
+    lines = [line.strip("\n") for line in difflib.unified_diff(new, old)]
+    return lines[2:]
+
+
 def get_added_style_diff(f):
     '''
     Run uncrustify for files that are new, can run on whole file.
@@ -111,25 +121,7 @@ def get_added_style_diff(f):
     output = subprocess.check_output(uncrustify_cmd.split()).decode()
     if DEBUG:
         print("output: " + output)
-    # TODO: check return code and that file was created...
-    diff_cmd = "diff -u {} {}".format(f, "{}.uncrustify".format(f))
-    output = ""
-    if DEBUG:
-        print("Executing: " + diff_cmd)
-    try:
-        subprocess.check_output(diff_cmd.split())
-    except subprocess.CalledProcessError as e:
-        # files differ
-        if e.returncode == 1:
-            output = e.output.decode('utf-8')
-        else:
-            raise Exception("Error generating diff for: {}".format(f))
-        # remove initial diff lines with file names
-        lines = output.splitlines()[2:]
-        output = "\n".join(lines)
-    if DEBUG:
-        print("output: " + output)
-    return output
+    return "\n".join(diff_files(f, "{}.uncrustify".format(f)))
 
 
 def get_changed_style_diff(f, commit_range):
@@ -199,22 +191,7 @@ def get_changed_style_diff(f, commit_range):
         print("output: " + output)
 
     # TODO: check return code and that file was created...
-    diff_cmd = "diff -u {} {}".format(f, "{}.uncrustify".format(f))
-    output = ""
-    if DEBUG:
-        print("Executing: " + diff_cmd)
-    try:
-        subprocess.check_output(diff_cmd.split())
-    except subprocess.CalledProcessError as e:
-        # files differ
-        if e.returncode == 1:
-            output = e.output.decode('utf-8')
-        else:
-            raise Exception("Error generating diff for: {}".format(f))
-        # remove initial diff lines with file names
-        lines = output.splitlines()[2:]
-    if DEBUG:
-        print("output: " + output)
+    lines = diff_files(f, "{}.uncrustify".format(f))
 
     # FIXME: if there were no changes, output here will be == "", and
     #        the lines below will fail. But could this ever happen?
@@ -226,7 +203,7 @@ def get_changed_style_diff(f, commit_range):
 
     range_re = re.compile(DIFF_RANGE)
 
-    if output != "":
+    if len(lines) > 0:
         valid_lines = []
         valid = False
         for line in lines:
@@ -243,6 +220,8 @@ def get_changed_style_diff(f, commit_range):
             if valid:
                 valid_lines.append(line)
         output = "\n".join(valid_lines)
+    else:
+        output = "\n".join(lines)
 
     return output
 
