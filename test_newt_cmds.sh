@@ -24,9 +24,8 @@ declare -a commands=(
 "newt version"
 "newt new project"
 "cd project/"
-"newt install -v --escape=false apache-mynewt-core apache-mynewt-nimble"
+"newt upgrade -v --escape=false apache-mynewt-core apache-mynewt-nimble"
 "newt info"
-"newt upgrade"
 "cp -r $HOME/ci/mynewt-core-targets/* targets"
 "newt build nordic_pca10056_btshell"
 "newt create-image nordic_pca10056_btshell 1.0.0"
@@ -51,7 +50,6 @@ declare -a commands=(
 "newt target cmake nordic_pca10056_btshell"
 "newt target dep nordic_pca10056_btshell"
 "newt target revdep nordic_pca10056_btshell"
-"newt sync"
 )
 
 if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
