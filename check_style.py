@@ -214,7 +214,7 @@ def get_changed_style_diff(f, commit_range):
                 ln, n = int(m.group(1)), int(m.group(2))
                 for r in ranges:
                     # does the current chunk intesect with some range?
-                    if ln + n > r[0] and n < (r[0] + r[1]):
+                    if ln + n > r[0] and ln < (r[0] + r[1]):
                         valid = True
                         break
             if valid:
