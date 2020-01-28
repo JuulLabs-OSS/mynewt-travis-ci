@@ -50,6 +50,8 @@ declare -a commands=(
 "newt target cmake nordic_pca10056_btshell"
 "newt target dep nordic_pca10056_btshell"
 "newt target revdep nordic_pca10056_btshell"
+"rm -rf repos/apache-mynewt-mcumgr"
+"newt upgrade -v"
 )
 
 if [ "${TRAVIS_OS_NAME}" != "windows" ]; then
