@@ -40,6 +40,9 @@ GH_COMMENT_TITLE = """
 GH_COMMENT_EMPTY = """
 #### No suggestions at this time!
 """
+GH_CODING_STYLE_URL = """
+### Our coding style is [here!](https://github.com/apache/mynewt-core/blob/master/CODING_STANDARDS.md)
+"""
 GH_COMMENT_DIFF = """
 #### {}
 <details>
@@ -260,6 +263,7 @@ def main():
     if len(file_outputs) == 0:
         comments.append(GH_COMMENT_EMPTY)
     else:
+        comments.append(GH_CODING_STYLE_URL)
         for (file, output) in file_outputs:
             comments.append(GH_COMMENT_DIFF.format(file, output))
     comment = "\n".join(comments)
