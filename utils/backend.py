@@ -20,11 +20,29 @@
 import json
 import os
 import requests
+import time
 import zlib
 
 GH_COMMENTER_URL = "https://github-commenter-l845aj3j3m9f.runkit.sh"
 GH_STATUS_REPORTER_URL = \
     "https://github-status-reporter-eb26h8raupyw.runkit.sh"
+MAX_RETRIES = 3
+RETRY_WAIT_TIME = 30
+
+
+def do_post(url, data, headers):
+    retry = 1
+    while retry <= MAX_RETRIES:
+        r = requests.post(url, data=data, headers=headers)
+        # FIXME: should use the correct code for no respose here?
+        if r.status_code == 200:
+            break
+        else:
+            # FIXME: when it fails lt we know what has gone wrong!
+            print("post http status: {}".format(r.status_code))
+        time.sleep(RETRY_WAIT_TIME)
+        retry += 1
+    return r.status_code == 200
 
 
 def new_comment(owner, repo, pr, comment_body):
@@ -38,8 +56,7 @@ def new_comment(owner, repo, pr, comment_body):
         'number': pr,
         'body': comment_body,
     }).encode('utf-8'))
-    r = requests.post(GH_COMMENTER_URL, data=payload, headers=headers)
-    return r.status_code == 200
+    return do_post(GH_COMMENTER_URL, data=payload, headers=headers)
 
 
 def send_status(owner, repo, sha, state):
@@ -54,5 +71,4 @@ def send_status(owner, repo, sha, state):
         'sha': sha,
         'state': state,
     }).encode('utf-8'))
-    r = requests.post(GH_STATUS_REPORTER_URL, data=payload, headers=headers)
-    return r.status_code == 200
+    return do_post(GH_STATUS_REPORTER_URL, data=payload, headers=headers)
