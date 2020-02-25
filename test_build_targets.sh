@@ -29,6 +29,11 @@ for target in ${TARGETS}; do
 
     rc=$?
     [[ $rc -ne 0 ]] && EXIT_CODE=$rc
+
+    # When a command is not found the shell sets $? to 127. We fail early here
+    # to avoid spending time trying to build all targets when we know newt was
+    # not correctly installed
+    [[ $rc -eq 127 ]] && break
 done
 
 exit $EXIT_CODE
