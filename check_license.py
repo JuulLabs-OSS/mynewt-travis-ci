@@ -20,9 +20,11 @@
 from utils import cli, backend
 import subprocess
 import os
+import os.path as path
 import requests
 import json
-import tarfile
+import pathlib
+import shutil
 from datetime import datetime
 
 
@@ -32,11 +34,13 @@ RAT_STYLESHEET = os.environ['HOME'] + '/ci/mynewt-rat-json.xsl'
 TRAVIS_REPO_SLUG = os.environ['TRAVIS_REPO_SLUG']
 TRAVIS_PULL_REQUEST = os.environ['TRAVIS_PULL_REQUEST']
 TRAVIS_COMMIT_RANGE = os.environ['TRAVIS_COMMIT_RANGE']
+TRAVIS_BUILD_DIR = os.environ['TRAVIS_BUILD_DIR']
 LICENSE_BOT_ID = "<!-- license-bot -->"
 RAT_PATH = "apache-rat.jar"
-TARBALL_NAME = "archive.tgz"
 RAT_URL = "https://repository.apache.org/content/repositories/releases/org" \
           "/apache/rat/apache-rat/0.13/apache-rat-0.13.jar"
+RAT_EXCLUDES = ".rat-excludes"
+RAT_RUN_DIR = TRAVIS_BUILD_DIR + "-rat"
 
 GH_STATUS_REPORTER_URL = \
     "https://github-status-reporter-eb26h8raupyw.runkit.sh"
@@ -55,27 +59,29 @@ def install_rat():
     open(RAT_PATH, 'wb').write(r.content)
 
 
-def tar_files(tarball, files):
+def new_rat_tree(src, dst, files):
     '''
-    Combine files into an archive
+    Create a tree copy of all files from src to dst
     '''
-    # RAT works only on archives and directories
-    with tarfile.open(TARBALL_NAME, 'w:gz') as tgz:
-        for file in files:
-            tgz.add(file)
+    for file in files:
+        dirname = path.join(dst, path.dirname(file))
+        pathlib.Path(dirname).mkdir(parents=True, exist_ok=True)
+        src_file = path.join(src, file)
+        dst_file = path.join(dst, file)
+        shutil.copy2(src_file, dst_file)
 
 
-def run_rat(rat_path, tarball):
+def run_rat(rat_path, tree, exclude_file):
     '''
-    Execute RAT on this archive and return the results
+    Execute RAT on this directory and return the results
     '''
-    rat_cmd = "java -jar {} --stylesheet {} {}".format(
-        rat_path, RAT_STYLESHEET, tarball)
+    rat_cmd = "java -jar {} -d {} --exclude-file {} --stylesheet {}".format(
+        rat_path, tree, exclude_file, RAT_STYLESHEET)
     if DEBUG:
         print("Executing: " + rat_cmd)
     output = subprocess.check_output(rat_cmd.split()).decode()
     if DEBUG:
-        print(output)
+        print("output: {}".format(output))
     return output
 
 
@@ -116,11 +122,20 @@ if DEBUG:
     print("Installing RAT...")
 install_rat()
 if DEBUG:
-    print("Archiving files...")
-tar_files(TARBALL_NAME, added_files)
+    print("Creating RAT tree...")
+new_rat_tree(TRAVIS_BUILD_DIR, RAT_RUN_DIR, added_files)
 if DEBUG:
     print("Running RAT...")
-output = run_rat(RAT_PATH, TARBALL_NAME)
+# Use .rat-excludes from original tree; it already has the changes
+# included in the PR
+output = run_rat(RAT_PATH, RAT_RUN_DIR,
+                 path.join(TRAVIS_BUILD_DIR, RAT_EXCLUDES))
+
+# FIXME: this is required for now because RAT prints a message to stdout
+#        when parsing the excludes file even when receiving a stylesheet
+#        for output formatting, so we have to remove the first line.
+output = "\n".join(output.splitlines()[1:])
+
 rat = json.loads(output)
 
 commits = cli.get_commit_list(TRAVIS_COMMIT_RANGE, DEBUG)
@@ -141,18 +156,28 @@ file_in_commit = get_files_per_commits(commits)
 # Under unknown and files, look for each file and add an extra
 # key->val for the sha where it was added
 
+# When RAT is run on a directory, the files have the prepended absolute
+# path of the directory where they are run. Here we get the name of this
+# directory to remove from the names in the file dictionaries
+rat_run_dir = path.normpath(RAT_RUN_DIR) + "/"
+
 try:
     unknown_files = rat['unknown']
     for file in unknown_files:
-        file['sha'] = file_in_commit[file['name']]
+        name = file['name'].replace(rat_run_dir, "")
+        file['name'] = name
+        file['sha'] = file_in_commit[name]
 except KeyError:
-    print("Key {} not found in 'unknown': {}".format(file['name'], file_in_commit))
+    print("Key {} not found in 'unknown': {}".format(file['name'],
+                                                     file_in_commit))
     exit(1)
 
 try:
     new_files = rat['files']
     for file in new_files:
-        file['sha'] = file_in_commit[file['name']]
+        name = file['name'].replace(rat_run_dir, "")
+        file['name'] = name
+        file['sha'] = file_in_commit[name]
 except KeyError:
     print("Key {} not found in 'files': {}".format(file['name'], file_in_commit))
     exit(1)
@@ -188,6 +213,8 @@ comment = """
 
 {}
 
+## {} new files were excluded from check (.rat-excludes)
+
 <details>
   <summary>Detailed analysis</summary>
 
@@ -199,7 +226,7 @@ comment = """
 </details>
 
 """.format(LICENSE_BOT_ID, str(timestamp), "\n".join(unknown_files_fmt),
-           "\n".join(new_files))
+           len(file_in_commit), "\n".join(new_files))
 
 if DEBUG:
     print("Comment body: ", comment)
