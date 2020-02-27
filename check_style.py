@@ -271,8 +271,12 @@ def main():
     if DEBUG:
         print("Comment body: ", comment)
     owner, repo = TRAVIS_REPO_SLUG.split("/")
-    if not backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
-        exit(1)
+    try:
+        if not backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
+            exit(1)
+    except backend.HttpError as e:
+        comment = STYLE_BOT_ID + "\n## Style check fail: " + str(e)
+        backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment)
 
 
 if __name__ == '__main__':

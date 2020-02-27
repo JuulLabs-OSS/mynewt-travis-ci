@@ -30,19 +30,25 @@ MAX_RETRIES = 3
 RETRY_WAIT_TIME = 30
 
 
+class HttpError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
 def do_post(url, data, headers):
     retry = 1
     while retry <= MAX_RETRIES:
         r = requests.post(url, data=data, headers=headers)
-        # FIXME: should use the correct code for no respose here?
-        if r.status_code == 200:
+
+        # 413 means payload too large, it happens when we try to submit too
+        # much data; in this situation there's not point in retrying
+        if r.status_code == 200 or r.status_code == 413:
             break
         else:
-            # FIXME: when it fails lt we know what has gone wrong!
-            print("post http status: {}".format(r.status_code))
+            print("FAIL - http status: {}".format(r.status_code))
         time.sleep(RETRY_WAIT_TIME)
         retry += 1
-    return r.status_code == 200
+    return r.status_code
 
 
 def new_comment(owner, repo, pr, comment_body):
@@ -56,7 +62,13 @@ def new_comment(owner, repo, pr, comment_body):
         'number': pr,
         'body': comment_body,
     }).encode('utf-8'))
-    return do_post(GH_COMMENTER_URL, data=payload, headers=headers)
+    status = do_post(GH_COMMENTER_URL, data=payload, headers=headers)
+    if status == 413:
+        raise HttpError("Payload was too large")
+    elif status != 200:
+        # this is for debug, better handling can be added in the future
+        raise HttpError("HTTP status {}".format(status))
+    return True
 
 
 def send_status(owner, repo, sha, state):
@@ -71,4 +83,5 @@ def send_status(owner, repo, sha, state):
         'sha': sha,
         'state': state,
     }).encode('utf-8'))
-    return do_post(GH_STATUS_REPORTER_URL, data=payload, headers=headers)
+    status = do_post(GH_STATUS_REPORTER_URL, data=payload, headers=headers)
+    return status == 200
