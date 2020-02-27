@@ -230,8 +230,12 @@ comment = """
 
 if DEBUG:
     print("Comment body: ", comment)
-if not backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
-    exit(1)
+try:
+    if not backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment):
+        exit(1)
+except backend.HttpError as e:
+    comment = LICENSE_BOT_ID + "\n## License check fail: " + str(e)
+    backend.new_comment(owner, repo, TRAVIS_PULL_REQUEST, comment)
 
 # FIXME: check category-x?
 sha, state = None, None
