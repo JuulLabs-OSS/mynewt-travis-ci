@@ -62,7 +62,7 @@ def load_ignored_dirs():
         lines = f.readlines()
         for line in lines:
             line = line.strip()
-            if line != "" and regex.match(line) is not None:
+            if line != "" and regex.match(line) is None:
                 IGNORED_DIRS.append(line)
 
 
