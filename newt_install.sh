@@ -17,6 +17,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
+retry_3_times() {
+    for i in 1 2 3; do
+        $*
+        [[ $? -eq 0 ]] && break
+        [[ $i -eq 3 ]] && exit 1
+        sleep 30
+    done
+}
+
 export GOPATH=$HOME/gopath
 export GO111MODULE=on
 
@@ -24,17 +33,10 @@ mkdir -p $HOME/bin $GOPATH || true
 
 go version
 
-for i in 1 2 3
-do
-   go get mynewt.apache.org/newt/newt
-   [[ $? -eq 0 ]] && break
-   [[ $i -eq 3 ]] && exit 1
-   sleep 30
-done
+retry_3_times go get -v mynewt.apache.org/newt/newt
 
 rm -rf $GOPATH/bin $GOPATH/pkg
 
-go install mynewt.apache.org/newt/newt
-[[ $? -ne 0 ]] && exit 1
+retry_3_times go install -v mynewt.apache.org/newt/newt
 
 cp $GOPATH/bin/newt $HOME/bin
