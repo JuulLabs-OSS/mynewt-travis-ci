@@ -1,0 +1,2 @@
+syscfg.vals:
+    BSP_NRF5340_NET_ENABLE: 1
