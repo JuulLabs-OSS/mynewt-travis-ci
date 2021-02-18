@@ -1,4 +1,4 @@
-pkg.name: targets/scanner
+pkg.name: targets/nordic_pca10056_scanner
 pkg.type: target
 pkg.description: 
 pkg.author: 
