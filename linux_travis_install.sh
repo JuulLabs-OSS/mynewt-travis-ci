@@ -28,8 +28,8 @@ fi
 # Do not install ARM toolchain when running "newt test"
 if [ "${TEST}" == "TEST_ALL" ] || [ "${TEST}" == "TEST_NEWT" ]; then
   # FIXME: should use update-alternatives here maybe?
-    ln -s /usr/bin/gcc-7 ~/bin/gcc
-    ln -s /usr/bin/g++-7 ~/bin/g++
+    ln -s /usr/bin/gcc-8 ~/bin/gcc
+    ln -s /usr/bin/g++-8 ~/bin/g++
 fi
 
 if [ "${TEST}" != "TEST_ALL" ]; then
