@@ -29,13 +29,6 @@ else
     $HOME/ci/newt_install.sh
 fi
 
-if [ "${TEST}" == "TEST_ALL" ] || [ "${TEST}" == "TEST_NEWT" ]; then
-    # conflicts with gcc5
-    brew cask uninstall oclint
-
-    PKGS=(gcc5)
-fi
-
 if [ "${TEST}" != "TEST_ALL" ]; then
     brew untap caskroom/cask
 
@@ -46,16 +39,9 @@ if [ "${TEST}" != "TEST_ALL" ]; then
     git checkout b3a2e0c930~
     popd
 
-    PKGS=()
-
     # FIXME: casks don't work with `fetch --retry`
     brew cask install gcc-arm-embedded
 fi
-
-for pkg in ${PKGS[@]}; do
-    brew fetch --retry $pkg
-    brew install $pkg
-done
 
 if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble && $TEST == "BUILD_PORTS" ]]; then
     # RIOT-OS requires update to Python3
