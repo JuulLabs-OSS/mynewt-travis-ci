@@ -27,16 +27,10 @@ retry_3_times() {
 }
 
 export GOPATH=$HOME/gopath
-export GO111MODULE=on
 
 mkdir -p $HOME/bin $GOPATH || true
 
 go version
-
-retry_3_times go get -v mynewt.apache.org/newt/newt
-
-rm -rf $GOPATH/bin $GOPATH/pkg
-
-retry_3_times go install -v mynewt.apache.org/newt/newt
+retry_3_times go install -v mynewt.apache.org/newt/newt@latest
 
 cp $GOPATH/bin/newt $HOME/bin
