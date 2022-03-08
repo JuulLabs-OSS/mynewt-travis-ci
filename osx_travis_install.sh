@@ -39,8 +39,16 @@ if [ "${TEST}" != "TEST_ALL" ]; then
     git checkout b3a2e0c930~
     popd
 
+    echo "outputting dots to keep travis from killing us..."
+    while true; do
+        echo -n "."
+        sleep 30
+    done &
+    DOT_PID=$!
+
     # FIXME: casks don't work with `fetch --retry`
     brew cask install gcc-arm-embedded
+    kill $DOT_PID
 fi
 
 if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble && $TEST == "BUILD_PORTS" ]]; then
