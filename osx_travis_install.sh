@@ -30,17 +30,7 @@ else
 fi
 
 if [ "${TEST}" != "TEST_ALL" ]; then
-    brew untap caskroom/cask
-
-    # Tap full clone to allow checkout of specific sha below
-    brew tap --full homebrew/cask
-
-    pushd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask
-    git checkout b3a2e0c930~
-    popd
-
-    # FIXME: casks don't work with `fetch --retry`
-    brew cask install gcc-arm-embedded
+    brew install gcc-arm-embedded
 fi
 
 if [[ $TRAVIS_REPO_SLUG =~ mynewt-nimble && $TEST == "BUILD_PORTS" ]]; then
