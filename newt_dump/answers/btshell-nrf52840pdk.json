@@ -5854,6 +5854,11 @@
                 "package": "@apache-mynewt-core/sys/console/full"
             },
             {
+                "name": "mfg_init",
+                "stage": 100,
+                "package": "@apache-mynewt-core/sys/mfg"
+            },
+            {
                 "name": "ble_hci_ram_init",
                 "stage": 100,
                 "package": "@apache-mynewt-nimble/nimble/transport/ram"
@@ -5862,11 +5867,6 @@
                 "name": "log_init",
                 "stage": 100,
                 "package": "@apache-mynewt-core/sys/log/full"
-            },
-            {
-                "name": "mfg_init",
-                "stage": 100,
-                "package": "@apache-mynewt-core/sys/mfg"
             },
             {
                 "name": "modlog_init",
@@ -5899,14 +5899,14 @@
                 "package": "@apache-mynewt-nimble/nimble/host/services/ans"
             },
             {
-                "name": "ble_store_ram_init",
-                "stage": 500,
-                "package": "@apache-mynewt-nimble/nimble/host/store/ram"
-            },
-            {
                 "name": "shell_init",
                 "stage": 500,
                 "package": "@apache-mynewt-core/sys/shell"
+            },
+            {
+                "name": "ble_store_ram_init",
+                "stage": 500,
+                "package": "@apache-mynewt-nimble/nimble/host/store/ram"
             }
         ]
     },
