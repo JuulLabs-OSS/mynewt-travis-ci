@@ -7493,14 +7493,14 @@
                 "package": "@apache-mynewt-core/sys/config"
             },
             {
-                "name": "ble_hci_ram_init",
-                "stage": 100,
-                "package": "@apache-mynewt-nimble/nimble/transport/ram"
-            },
-            {
                 "name": "log_init",
                 "stage": 100,
                 "package": "@apache-mynewt-core/sys/log/full"
+            },
+            {
+                "name": "modlog_init",
+                "stage": 100,
+                "package": "@apache-mynewt-core/sys/log/modlog"
             },
             {
                 "name": "mfg_init",
@@ -7508,9 +7508,9 @@
                 "package": "@apache-mynewt-core/sys/mfg"
             },
             {
-                "name": "modlog_init",
+                "name": "ble_hci_ram_init",
                 "stage": 100,
-                "package": "@apache-mynewt-core/sys/log/modlog"
+                "package": "@apache-mynewt-nimble/nimble/transport/ram"
             },
             {
                 "name": "ble_hs_init",
@@ -7548,6 +7548,11 @@
                 "package": "@apache-mynewt-nimble/nimble/host/services/ans"
             },
             {
+                "name": "split_app_init",
+                "stage": 500,
+                "package": "@apache-mynewt-core/boot/split"
+            },
+            {
                 "name": "ble_store_config_init",
                 "stage": 500,
                 "package": "@apache-mynewt-nimble/nimble/host/store/config"
@@ -7558,19 +7563,14 @@
                 "package": "@apache-mynewt-core/sys/id"
             },
             {
-                "name": "imgmgr_module_init",
-                "stage": 500,
-                "package": "@apache-mynewt-core/mgmt/imgmgr"
-            },
-            {
                 "name": "nmgr_pkg_init",
                 "stage": 500,
                 "package": "@apache-mynewt-core/mgmt/newtmgr"
             },
             {
-                "name": "split_app_init",
+                "name": "imgmgr_module_init",
                 "stage": 500,
-                "package": "@apache-mynewt-core/boot/split"
+                "package": "@apache-mynewt-core/mgmt/imgmgr"
             },
             {
                 "name": "newtmgr_ble_pkg_init",
