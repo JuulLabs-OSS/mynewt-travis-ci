@@ -26,7 +26,7 @@ do
     target="${target%.json}"
 
     printf "Checking target \"$target\"\n"
-    newt target dump "$target" > tmp.txt
+    newt target dump "$target" | jq 'del(.sysinit)' > tmp.txt
     diff -w "$i" tmp.txt
     rc="$?"
 

@@ -38,7 +38,7 @@ fi
         then
             filename="answers/$t.json"
             echo "Generating $filename"
-            newt target dump "$t" > "../../$filename"
+            newt target dump "$t" | jq 'del(.sysinit)' > "../../$filename"
         fi
     done
 )

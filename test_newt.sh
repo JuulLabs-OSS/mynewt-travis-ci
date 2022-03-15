@@ -22,5 +22,7 @@ set -e
 cd $HOME/ || exit 1
 $HOME/ci/test_newt_cmds.sh
 
-cd $HOME/ci/newt_dump/proj || exit 1
-$HOME/ci/test_newt_dump.sh
+if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+	cd $HOME/ci/newt_dump/proj || exit 1
+	$HOME/ci/test_newt_dump.sh
+fi
