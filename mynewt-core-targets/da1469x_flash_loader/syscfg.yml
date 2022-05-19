@@ -1,0 +1,4 @@
+syscfg.vals:
+    FLASH_LOADER_DL_SZ: 0x10000
+    RAM_RESIDENT: 1
+    MCU_GPIO_RETAINABLE_NUM: -1
